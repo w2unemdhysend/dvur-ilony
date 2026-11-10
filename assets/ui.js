@@ -80,6 +80,8 @@
   }
 
   function init(){
+    // iOS Safari and Telegram on iPhone apply :active (the pressed look) only when a touch listener exists
+    document.addEventListener('touchstart', function(){}, {passive: true});
     var b = document.getElementById('themebtn');
     if (b) b.addEventListener('click', function(){
       var t = current() === 'dark' ? 'light' : 'dark';
