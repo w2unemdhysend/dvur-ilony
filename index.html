@@ -5,81 +5,105 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>(function(){try{var s=null;try{s=localStorage.getItem('dvur-theme')}catch(e){}var w=window.Telegram&&Telegram.WebApp;var tg=w&&w.platform&&w.platform!=='unknown';var t=s||(tg?(w.colorScheme==='dark'?'dark':'light'):(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));document.documentElement.setAttribute('data-theme',t)}catch(e){}})();</script>
-<title>Акції магазинів Двур-Кралове</title>
+<title>Акції тижня в Двур-Кралове</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:wght@700;800&family=Golos+Text:wght@400;500;600&display=swap">
 <style>
-/* Layout: one column; search across all chains (kupi.cz) on top, category switch, then one card per chain with its stores and the button to its current flyer */
+/* Leták vernacular: cool newsprint paper, print-blue ink, price-tag yellow, sale red.
+   One loud element, the week strip (the leták rhythm of the town); everything else is a quiet coupon sheet. */
 :root{
   padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom);
-  --bg:#ECEAEE; --surface:#F8F7F9; --ink:#17141B; --muted:#5C5663; --line:#D3CED8; --accent:#A8235E;
-  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
-  --f-body:"Onest","Segoe UI",Roboto,system-ui,sans-serif;
+  --bg:#E9ECE6; --surface:#FAFBF7; --ink:#1B2330; --muted:#556070; --line:#C9CFC6; --ctl:#7E8781; --mk-edge:#1B2330;
+  --tag:#FFD23F; --tag-ink:#1B2330; --tag-soft:#FFF0B3; --sale:#C8102E; --accent:#C8102E;
+  --f-display:"Fira Sans Extra Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Golos Text","Segoe UI",Roboto,system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){ --bg:#141117; --surface:#1E1A22; --ink:#ECE8EF; --muted:#A79FAE; --line:#332D39; --accent:#FF8DBE; color-scheme:dark; }
+  :root:not([data-theme="light"]){ --bg:#0F1216; --surface:#181C22; --ink:#ECEFE8; --muted:#9BA5B1; --line:#2C333D; --ctl:#6B7480; --mk-edge:transparent; --tag-soft:#3A3318; --sale:#FF6B7D; --accent:#FF6B7D; color-scheme:dark; }
 }
-:root[data-theme="dark"]{ --bg:#141117; --surface:#1E1A22; --ink:#ECE8EF; --muted:#A79FAE; --line:#332D39; --accent:#FF8DBE; color-scheme:dark; }
+:root[data-theme="dark"]{ --bg:#0F1216; --surface:#181C22; --ink:#ECEFE8; --muted:#9BA5B1; --line:#2C333D; --ctl:#6B7480; --mk-edge:transparent; --tag-soft:#3A3318; --sale:#FF6B7D; --accent:#FF6B7D; color-scheme:dark; }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.5 var(--f-body);
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0 40px}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 [hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 button,input{font:inherit;color:inherit}
 :focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
 .wrap{max-width:560px;margin:0 auto}
-.top{padding-block:16px 10px}
-.eyebrow{font-weight:600;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-h1{font-family:var(--f-display);font-weight:700;font-size:32px;line-height:1.05;margin:6px 0 8px;letter-spacing:-.01em}
-.lede{margin:0;color:var(--muted);font-size:16px;max-width:44ch}
-h2{font-family:var(--f-display);font-weight:600;font-size:18px;line-height:1.2;margin:0}
-main{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding-top:10px}
+.top{padding-block:16px 4px}
+h1{font-family:var(--f-display);font-weight:800;font-size:48px;line-height:.92;margin:0 0 10px;letter-spacing:-.005em}
+.lede{margin:0;color:var(--muted);font-size:16px;max-width:42ch}
+h2{font-family:var(--f-display);font-weight:700;font-size:27px;line-height:1;margin:0}
+main{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;padding-top:14px}
 
-.find{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
+/* the week strip: Mon..Sun of this week in Prague time, today inverted, a yellow price-tag bar under days when new flyers start */
+.week{display:grid;gap:10px}
+.days{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.day{display:grid;justify-items:center;gap:2px;padding:8px 0 9px;border-radius:8px;background:var(--surface);border:1px solid var(--line)}
+.day .dn{font-size:13px;line-height:1;color:var(--muted)}
+.day .dd{font-family:var(--f-display);font-weight:700;font-size:26px;line-height:1}
+.day .mk{width:22px;height:6px;border-radius:2px;background:transparent}
+.day.change .mk{background:var(--tag);box-shadow:0 0 0 1px var(--mk-edge)}
+.day.today.change .mk{box-shadow:none}
+.day.today{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.day.today .dn{color:inherit;opacity:.8}
+.weeksum{margin:0;font-size:16px;line-height:1.4}
+.weeksum b{font-weight:600}
+
+/* search across all chains (kupi.cz) */
+.find{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
 .find label{display:block;font-weight:600;font-size:16px;margin-bottom:8px}
 .find .row{display:flex;gap:8px}
-.find input{flex:1;min-width:0;min-height:48px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);font-size:17px}
+.find input{flex:1;min-width:0;min-height:48px;padding:0 14px;border-radius:10px;border:1px solid var(--ctl);background:var(--bg);font-size:17px}
 .find input::placeholder{color:var(--muted);opacity:1}
 .find p{margin:10px 0 8px;font-size:14px;line-height:1.4;color:var(--muted)}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{display:inline-flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:44px;padding:4px 12px;border-radius:12px;border:1px solid var(--line);background:transparent;cursor:pointer;text-align:left;line-height:1.2}
+.chip{display:inline-flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:44px;padding:4px 12px;border-radius:10px;border:1px solid var(--ctl);background:transparent;cursor:pointer;text-align:left;line-height:1.2}
 .chip b{font-weight:600;font-size:15px}
 .chip small{font-size:12px;color:var(--muted)}
+.hint{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--tag-soft);font-size:14px;line-height:1.4}
+.hint svg{flex:none;width:18px;height:18px;margin-top:1px}
+.hint p{margin:0;color:var(--ink)}
+.hint button{display:block;margin-top:2px;padding:0;min-height:44px;border:0;background:none;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 
-.chain{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 14px 12px;animation:in .3s ease backwards}
-@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* the coupon sheet: one surface, chains separated by perforation lines */
+#list{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.chain{padding:16px 14px 14px}
+.chain + .chain{border-top:1.5px dashed var(--line)}
 .chain .head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .chain .kind{font-size:14px;color:var(--muted);text-align:right}
-.week{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:14px;color:var(--accent);font-weight:500}
-.week svg{width:16px;height:16px;flex:none}
-.stores{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.when{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:14px;color:var(--muted)}
+.when svg{width:16px;height:16px;flex:none}
+.tag{display:inline-flex;align-items:center;margin-top:8px;padding:3px 10px 3px 14px;font-weight:600;font-size:14px;line-height:1.3;color:var(--tag-ink);background:var(--tag);
+  clip-path:polygon(7px 0,100% 0,100% 100%,7px 100%,0 50%)}
+.tag.soon{background:var(--tag-soft);color:var(--ink)}
+.stores{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
 .store{display:flex;align-items:center;gap:8px;font-size:16px;line-height:1.3}
 .store > span{min-width:0;flex:1}
 .store small{display:block;color:var(--muted);font-size:14px}
-.pin{flex:none;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);display:grid;place-items:center;color:var(--ink)}
+.pin{flex:none;width:44px;height:44px;border-radius:10px;border:1px solid var(--ctl);display:grid;place-items:center;color:var(--ink)}
 .pin svg{width:20px;height:20px}
-.go{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:12px;border:0;cursor:pointer;
+.go{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 16px;border-radius:10px;border:0;cursor:pointer;
   background:var(--ink);color:var(--bg);font-weight:600;font-size:16px;text-decoration:none;white-space:nowrap;flex:none}
 .go svg{width:18px;height:18px}
-.go.small{min-height:40px;padding:0 12px;font-size:15px;border-radius:10px;background:transparent;color:var(--ink);border:1px solid var(--line)}
+.go.small{min-height:44px;padding:0 12px;font-size:15px;background:transparent;color:var(--ink);border:1px solid var(--ctl)}
 .chain > .go{width:100%;margin-top:12px}
 .note{margin:10px 0 0;font-size:15px;line-height:1.4;color:var(--muted)}
-.extra{display:block;margin-top:8px;font-size:15px;color:var(--ink);text-underline-offset:3px}
-.how{margin:4px 0 0;font-size:15px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
-.how p{margin:0}
-.how p + p{margin-top:6px}
-.gloss{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:0 14px}
+.extra{display:inline-flex;align-items:center;min-height:44px;font-size:15px;color:var(--ink);text-underline-offset:3px}
+
+.how{margin:0;font-size:15px;color:var(--muted)}
+.gloss{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 14px}
 .gloss summary{cursor:pointer;min-height:48px;display:flex;align-items:center;font-weight:600;font-size:16px;list-style-position:inside}
 .gloss dl{margin:0 0 12px;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:15px;line-height:1.35}
 .gloss dt{font-weight:600}
 .gloss dd{margin:0;color:var(--muted)}
 .foot{margin-top:16px;font-size:13px;color:var(--muted)}
-@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
-@media (min-width:480px){h1{font-size:38px}}
+@media (min-width:480px){h1{font-size:58px}}
 </style>
-<link rel="stylesheet" href="assets/ui.css?v=1">
+<link rel="stylesheet" href="assets/ui.css?v=2">
 </head>
 <body>
 <div class="wrap">
@@ -88,12 +112,16 @@ main{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding-top:10px}
       <div class="seg lang" role="group" aria-label="Мова · Jazyk"><span class="thumb" aria-hidden="true"></span><button type="button" data-lang="uk" aria-pressed="true" lang="uk" aria-label="Українська">UA</button><button type="button" data-lang="cs" aria-pressed="false" lang="cs" aria-label="Čeština">CZ</button></div>
       <button class="themebtn" id="themebtn" type="button" aria-label="Увімкнути темну тему"><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7L7 17M17 7l1.7-1.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6z" fill="currentColor"/></svg></button>
     </div>
-    <div class="eyebrow">Dvůr Králové nad Labem</div>
-    <h1 data-t="h1">Акції</h1>
+    <h1 data-t="h1"></h1>
     <p class="lede" data-t="lede"></p>
   </header>
 
   <main>
+    <section class="week" data-t-aria="weekLabel">
+      <ol class="days" id="days"></ol>
+      <p class="weeksum" id="weeksum" aria-live="polite"></p>
+    </section>
+
     <form class="find" id="find" role="search">
       <label for="q" data-t="findLabel"></label>
       <div class="row">
@@ -102,68 +130,90 @@ main{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding-top:10px}
       </div>
       <p data-t="findHint"></p>
       <div class="chips" id="chips"></div>
+      <div class="hint" id="hint" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+        <div><p data-t="hint"></p><button type="button" id="hintok" data-t="hintOk"></button></div>
+      </div>
     </form>
 
     <div class="seg cats" id="cats" role="group" data-t-aria="catsLabel"><span class="thumb" aria-hidden="true"></span></div>
-    <div id="list" aria-live="polite" style="display:grid;gap:12px"></div>
+    <div id="list"></div>
 
-    <div class="how"><p data-t="how1"></p><p data-t="how2"></p></div>
+    <p class="how" data-t="how"></p>
     <details class="gloss" id="gloss">
       <summary data-t="glossTitle"></summary>
       <dl id="glosslist"></dl>
     </details>
   </main>
 
-  <p class="foot" data-t="foot"></p>
+  <footer class="foot" data-t="foot"></footer>
 </div>
 
-<script src="assets/ui.js?v=1"></script>
+<script src="assets/ui.js?v=2"></script>
 <script>
 (function(){
   var T = {
     uk: {
-      title: 'Акції магазинів Двур-Кралове', h1: 'Акції',
-      lede: 'Рекламні проспекти магазинів міста. Кнопки відкривають офіційні сторінки мереж, і новий проспект з’являється там сам.',
+      title: 'Акції тижня в Двур-Кралове', h1: 'Акції тижня',
+      lede: 'Проспекти магазинів у Dvůr Králové nad Labem. Кнопки ведуть на офіційні сторінки мереж, де новий проспект з’являється сам.',
+      weekLabel: 'Коли виходять нові проспекти',
       findLabel: 'Знайти товар в акціях', findBtn: 'Шукати', placeholder: 'напр., máslo',
       findHint: 'Kupi.cz показує акції всіх мереж Чехії, тож видно, де дешевше. Пиши чеською:',
+      hint: 'Якщо kupi.cz покаже місто «Praha», натисни на нього, введи Dvůr Králové й підтверди кнопкою «Nastavit lokalitu». Сайт запам’ятає місто.',
+      hintOk: 'Зрозуміло',
       catsLabel: 'Категорія', flyer: 'Проспект цього тижня', flyerStore: 'Проспект', map: 'на карті',
-      how1: 'Більшість мереж починає нову акцію в середу. У Lidl два проспекти: від понеділка і від четверга, у COOP і Teta проспект діє два тижні.',
-      how2: 'Ціни з позначкою «s kartou» або «s aplikací» діють лише з карткою чи додатком магазину. Картки безкоштовні й оформлюються в додатку.',
+      today: 'Сьогодні', sumToday: 'Сьогодні нові акції', sumTomorrow: 'Завтра нові акції', next: 'Наступні нові акції',
+      newToday: 'нові акції від сьогодні', newTomorrow: 'нові акції завтра', everyWed: 'нові акції щосереди',
+      lidlToday: 'новий проспект від сьогодні', lidlTomorrow: 'новий проспект завтра', lidlIdle: 'нові проспекти в понеділок і четвер',
+      how: 'Ціни з позначкою «s kartou» або «s aplikací» діють лише з карткою чи додатком магазину. Картки безкоштовні й оформлюються в додатку.',
       glossTitle: 'Чеські слова в проспектах',
       foot: 'Адреси взято з пошуку магазинів на сайтах мереж і з OpenStreetMap, станом на листопад 2026. Ціни в чеських кронах (Kč).'
     },
     cs: {
-      title: 'Akce obchodů ve Dvoře Králové', h1: 'Akce',
-      lede: 'Akční letáky obchodů ve městě. Tlačítka otevírají oficiální stránky řetězců, kde se nový leták objeví sám.',
+      title: 'Akce týdne ve Dvoře Králové', h1: 'Akce týdne',
+      lede: 'Letáky obchodů ve Dvoře Králové nad Labem. Tlačítka vedou na oficiální stránky řetězců, kde se nový leták objeví sám.',
+      weekLabel: 'Kdy vycházejí nové letáky',
       findLabel: 'Najít zboží v akci', findBtn: 'Hledat', placeholder: 'třeba máslo',
       findHint: 'Kupi.cz ukáže akce všech řetězců v Česku, takže hned vidíte, kde je to levnější. Třeba:',
+      hint: 'Pokud kupi.cz ukáže lokalitu „Praha“, klepněte na ni, zadejte Dvůr Králové a potvrďte tlačítkem „Nastavit lokalitu“. Web si město zapamatuje.',
+      hintOk: 'Rozumím',
       catsLabel: 'Kategorie', flyer: 'Leták na tento týden', flyerStore: 'Leták', map: 'na mapě',
-      how1: 'Většina řetězců začíná novou akci ve středu. Lidl má dva letáky, od pondělí a od čtvrtka, COOP a Teta mají leták na dva týdny.',
-      how2: 'Ceny „s kartou“ nebo „s aplikací“ platí jen s věrnostní kartou či aplikací obchodu. Karty jsou zdarma a založíte si je v aplikaci.',
+      today: 'Dnes', sumToday: 'Dnes nové akce', sumTomorrow: 'Zítra nové akce', next: 'Další nové akce',
+      newToday: 'nové akce od dneška', newTomorrow: 'nové akce zítra', everyWed: 'nové akce každou středu',
+      lidlToday: 'nový leták od dneška', lidlTomorrow: 'nový leták zítra', lidlIdle: 'nové letáky v pondělí a ve čtvrtek',
+      how: 'Ceny „s kartou“ nebo „s aplikací“ platí jen s věrnostní kartou či aplikací obchodu. Karty jsou zdarma a založíte si je v aplikaci.',
       glossTitle: '', foot: 'Adresy pocházejí z vyhledávačů prodejen na webech řetězců a z OpenStreetMap, stav k listopadu 2026.'
     }
   };
+  // Mon..Sun; the "on <day>" forms are needed only for the days when flyers change
+  var DAYS = {uk: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'], cs: ['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne']};
+  var DAYS_FULL = {uk: ['понеділок', 'вівторок', 'середа', 'четвер', 'пʼятниця', 'субота', 'неділя'], cs: ['pondělí', 'úterý', 'středa', 'čtvrtek', 'pátek', 'sobota', 'neděle']};
+  var ON_DAY = {uk: {0: 'у понеділок', 2: 'у середу', 3: 'у четвер'}, cs: {0: 'v pondělí', 2: 've středu', 3: 've čtvrtek'}};
+  // weekly flyer cycles, checked on the chains' sites and kupi.cz in November 2026 (0 = Monday)
+  var CYCLES = {wed: [2], lidl: [0, 3]};
   var CATS = [['food', 'Продукти', 'Potraviny'], ['drug', 'Дрогерії', 'Drogerie'], ['home', 'Для дому', 'Domácnost']];
   var NEAR_K = {uk: 'біля Kauflandu', cs: 'u Kauflandu'};
   // Official pages that always show the current flyer. Stores with their own flyer carry it as the 2nd item.
   var CHAINS = [
     {cat:'food', name:'Kaufland', kind:{uk:'гіпермаркет', cs:'hypermarket'}, url:'https://prodejny.kaufland.cz/aktualne/servis/prodejna/dvur-kralove-4410.html',
-      week:{uk:'нова акція щосереди', cs:'nová akce každou středu'}, stores:[['17. listopadu 3111']],
+      cycle:'wed', stores:[['17. listopadu 3111']],
       note:{uk:'Частина цін діє лише з Kaufland Card у додатку Kaufland.', cs:'Některé ceny platí jen s Kaufland Card v aplikaci Kaufland.'}},
     {cat:'food', name:'Lidl', kind:{uk:'дискаунтер', cs:'diskont'}, url:'https://www.lidl.cz/c/akcni-letak/s10008644',
-      week:{uk:'від понеділка і від четверга', cs:'od pondělí a od čtvrtka'}, stores:[['Alešova 3344']],
+      cycle:'lidl', stores:[['Alešova 3344']],
       note:{uk:'Додаткові купони є в додатку Lidl Plus.', cs:'Další kupóny jsou v aplikaci Lidl Plus.'},
       extra:[{uk:'Отримувати проспект щотижня у WhatsApp', cs:'Leták každý týden na WhatsApp'}, 'https://www.lidl.cz/c/whatsapp-letak/s10051252']},
-    {cat:'food', name:'Tesco', kind:{uk:'гіпермаркет', cs:'hypermarket'}, url:'https://www.itesco.cz/akcni-nabidky/letaky-a-katalogy', stores:[['Alešova 3083']],
+    {cat:'food', name:'Tesco', kind:{uk:'гіпермаркет', cs:'hypermarket'}, url:'https://www.itesco.cz/akcni-nabidky/letaky-a-katalogy',
+      cycle:'wed', stores:[['Alešova 3083']],
       note:{uk:'На сторінці вибери магазин «Tesco Hypermarket Dvůr Králové». Ціни «Clubcard» діють лише з карткою Clubcard.', cs:'Na stránce vyberte obchod „Tesco Hypermarket Dvůr Králové“. Ceny „Clubcard“ platí jen s kartou Clubcard.'},
       extra:[{uk:'Що таке Clubcard', cs:'Co je Clubcard'}, 'https://www.itesco.cz/clubcard']},
-    {cat:'food', name:'BILLA', kind:{uk:'супермаркет', cs:'supermarket'}, url:'https://www.billa.cz/akcni-letaky', stores:[['Legionářská 2989']],
+    {cat:'food', name:'BILLA', kind:{uk:'супермаркет', cs:'supermarket'}, url:'https://www.billa.cz/akcni-letaky',
+      cycle:'wed', stores:[['Legionářská 2989']],
       note:{uk:'Окремо виходить проспект для BILLA Klub зі знижками за картку.', cs:'Zvlášť vychází leták pro BILLA Klub se slevami na kartu.'},
       extra:[{uk:'Додаток BILLA Klub', cs:'Aplikace BILLA Klub'}, 'https://www.billa.cz/billa-klub/aplikace']},
     {cat:'food', name:'PENNY', kind:{uk:'дискаунтер', cs:'diskont'}, url:'https://www.penny.cz/nabidky/letaky',
-      week:{uk:'нова акція щосереди', cs:'nová akce každou středu'}, stores:[['Nábřeží Benešovo 2913']]},
+      cycle:'wed', stores:[['Nábřeží Benešovo 2913']]},
     {cat:'food', name:'COOP', kind:{uk:'місцевий кооператив', cs:'místní družstvo'},
-      week:{uk:'проспект на два тижні, від середи', cs:'leták na dva týdny, od středy'},
+      when:{uk:'проспект на два тижні, від середи', cs:'leták na dva týdny, od středy'},
       stores:[['Čelakovského 2246', 'https://www.coopclub.cz/letaky/tip-extra-aktualni-letak/', 'COOP TIP'],
               ['Vrchlického 2232', 'https://www.coopclub.cz/letaky/tuty-tip-menu-aktualni-letak/', 'COOP TUTY']]},
     {cat:'drug', name:'dm', url:'https://www.dm.cz/services/zakaznicky-program-servis/aplikace-moje-dm-1347338', btn:{uk:'Купони в додатку Moje dm', cs:'Kupóny v aplikaci Moje dm'},
@@ -171,17 +221,17 @@ main{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding-top:10px}
       note:{uk:'dm робить ставку на постійно низькі ціни («Vždy výhodně»), а знижки дає купонами в додатку.', cs:'dm sází na trvale nízké ceny („Vždy výhodně“) a slevy dává jako kupóny v aplikaci.'}},
     {cat:'drug', name:'ROSSMANN', url:'https://www.rossmann.cz/obsah/akce-a-letaky', stores:[['Alešova 3348', null, 'OC Zálabí']],
       extra:[{uk:'Картка Rossmann Club', cs:'Rossmann Club'}, 'https://www.rossmann.cz/obsah/vernostni-programy/rossmann-club']},
-    {cat:'drug', name:'Teta', url:'https://www.tetadrogerie.cz/akce/letak', week:{uk:'проспект на два тижні', cs:'leták na dva týdny'},
+    {cat:'drug', name:'Teta', url:'https://www.tetadrogerie.cz/akce/letak', when:{uk:'проспект на два тижні', cs:'leták na dva týdny'},
       stores:[['Josefa Hory 7', null, {uk:'центр', cs:'centrum'}], ['17. listopadu 3150', null, NEAR_K]],
       extra:[{uk:'Картка Teta Klub', cs:'Teta Klub'}, 'https://www.tetadrogerie.cz/klub']},
     {cat:'home', name:'Action', kind:{uk:'дрібниці для дому', cs:'zboží pro domácnost'}, url:'https://www.action.com/cs-cz/tydenni-akce/',
-      week:{uk:'щосереди 150 новинок', cs:'každou středu 150 novinek'}, stores:[['17. listopadu 3146', null, NEAR_K]]}
+      cycle:'wed', stores:[['17. listopadu 3146', null, NEAR_K]]}
   ];
-  var CHIPS = [['máslo', 'масло'], ['mléko', 'молоко'], ['vejce', 'яйця'], ['káva', 'кава'], ['kuřecí', 'курятина'], ['sýr', 'сир'], ['banány', 'банани'], ['prací gel', 'гель для прання']];
+  var CHIPS = [['máslo', 'масло'], ['mléko', 'молоко'], ['vejce', 'яйця'], ['káva', 'кава'], ['kuřecí', 'курятина'], ['sýr', 'сир']];
   var GLOSS = [['leták', 'рекламний проспект з акціями'], ['akce, v akci', 'акція, зі знижкою'], ['sleva', 'знижка'], ['běžná cena', 'звичайна ціна'],
     ['platí od … do …', 'діє з … по …'], ['od středy', 'із середи'], ['s kartou, s aplikací', 'лише з карткою чи додатком магазину'],
     ['ks (kus)', 'штука'], ['cena za 1 kg', 'ціна за кілограм'], ['Kč', 'чеська крона (CZK)'], ['Vyberte prodejnu', 'виберіть магазин'], ['Zobrazit leták', 'показати проспект']];
-  var CAT_KEY = 'dvur-cat';
+  var CAT_KEY = 'dvur-cat', HINT_KEY = 'dvur-kupi-hint';
   var tg = window.UI && UI.tg;
   if (tg){ try { tg.ready(); tg.expand(); } catch(e){} }
 
@@ -193,25 +243,65 @@ main{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding-top:10px}
   var tr = function(v, l){ return v && typeof v === 'object' ? v[l] : (v || ''); };
   var mapUrl = function(chain, street){ return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(chain + ', ' + street + ', 544 01 Dvůr Králové nad Labem'); };
   var kupi = function(q){ return 'https://www.kupi.cz/hledej?f=' + encodeURIComponent(q); };
+  var get = function(k){ try { return localStorage.getItem(k); } catch(e){ return null; } };
+  var put = function(k, v){ try { localStorage.setItem(k, v); } catch(e){} };
 
-  function open(url){
-    if (tg && tg.openLink){ try { tg.openLink(url); return; } catch(e){} }
-    var w = window.open(url, '_blank', 'noopener'); if (!w) location.href = url;
+  // Today in Dvůr Králové (Europe/Prague), whatever the phone's own time zone: weekday 0 = Monday, and this week's Monday..Sunday dates
+  function pragueWeek(){
+    var p = {};
+    new Intl.DateTimeFormat('en-US', {timeZone: 'Europe/Prague', year: 'numeric', month: 'numeric', day: 'numeric', weekday: 'short'})
+      .formatToParts(new Date()).forEach(function(x){ p[x.type] = x.value; });
+    var dow = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].indexOf(p.weekday);
+    var base = Date.UTC(+p.year, +p.month - 1, +p.day);
+    var dates = [];
+    for (var i = 0; i < 7; i++){ var d = new Date(base + (i - dow) * 864e5); dates.push([d.getUTCDate(), d.getUTCMonth() + 1]); }
+    return {dow: dow, dates: dates};
+  }
+  // which chains start a new flyer on weekday d
+  function startingOn(d){ return CHAINS.filter(function(c){ return c.cycle && CYCLES[c.cycle].indexOf(d) >= 0; }).map(function(c){ return c.name; }); }
+  // status of a chain's flyer today: 'today', 'tomorrow' or null
+  function status(c, dow){
+    if (!c.cycle) return null;
+    if (CYCLES[c.cycle].indexOf(dow) >= 0) return 'today';
+    if (CYCLES[c.cycle].indexOf((dow + 1) % 7) >= 0) return 'tomorrow';
+    return null;
   }
 
-  function renderList(cat, l){
+  function renderWeek(l){
+    var t = T[l], w = pragueWeek();
+    document.getElementById('days').innerHTML = w.dates.map(function(dt, i){
+      var names = startingOn(i);
+      var label = DAYS_FULL[l][i] + ' ' + dt[0] + '. ' + dt[1] + '.' + (i === w.dow ? ', ' + t.today.toLowerCase() : '') + (names.length ? ': ' + names.join(', ') : '');
+      return '<li class="day' + (i === w.dow ? ' today' : '') + (names.length ? ' change' : '') + '"' + (i === w.dow ? ' aria-current="date"' : '') + '>' +
+        '<span class="sr">' + esc(label) + '</span><span class="dn" aria-hidden="true">' + DAYS[l][i] + '</span><span class="dd" aria-hidden="true">' + dt[0] + '</span><span class="mk" aria-hidden="true"></span></li>';
+    }).join('');
+    var now = startingOn(w.dow), soon = startingOn((w.dow + 1) % 7), parts = [];
+    if (now.length) parts.push(t.sumToday + ': <b>' + now.map(esc).join(', ') + '</b>.');
+    if (soon.length) parts.push(t.sumTomorrow + ': <b>' + soon.map(esc).join(', ') + '</b>.');
+    if (!parts.length){
+      for (var k = 2; k < 8; k++){ var d = (w.dow + k) % 7, n = startingOn(d); if (n.length){ parts.push(t.next + ' ' + ON_DAY[l][d] + ': <b>' + n.map(esc).join(', ') + '</b>.'); break; } }
+    }
+    document.getElementById('weeksum').innerHTML = parts.join(' ');
+    return w.dow;
+  }
+
+  function renderList(cat, l, dow){
     var t = T[l];
-    document.getElementById('list').innerHTML = CHAINS.filter(function(c){ return c.cat === cat; }).map(function(c, i){
+    document.getElementById('list').innerHTML = CHAINS.filter(function(c){ return c.cat === cat; }).map(function(c){
       var rows = c.stores.map(function(s){
         var small = tr(s[2], l);
         return '<li class="store"><span>' + esc(s[0]) + (small ? '<small>' + esc(small) + '</small>' : '') + '</span>' +
           link(mapUrl(c.name, s[0]), PIN, 'pin', c.name + ', ' + s[0] + ': ' + t.map) +
           (s[1] ? link(s[1], esc(t.flyerStore) + ' ' + ARROW, 'go small', t.flyerStore + ' ' + (small || c.name) + ', ' + s[0]) : '') + '</li>';
       }).join('');
+      var st = status(c, dow), lidl = c.cycle === 'lidl', when = '';
+      if (st === 'today') when = '<span class="tag">' + esc(lidl ? t.lidlToday : t.newToday) + '</span>';
+      else if (st === 'tomorrow') when = '<span class="tag soon">' + esc(lidl ? t.lidlTomorrow : t.newTomorrow) + '</span>';
+      else if (c.cycle) when = '<div class="when">' + CAL + '<span>' + esc(lidl ? t.lidlIdle : t.everyWed) + '</span></div>';
+      else if (c.when) when = '<div class="when">' + CAL + '<span>' + esc(tr(c.when, l)) + '</span></div>';
       var btn = c.btn ? tr(c.btn, l) : t.flyer;
-      return '<section class="chain" style="animation-delay:' + (i * 30) + 'ms" aria-label="' + esc(c.name) + '">' +
-        '<div class="head"><h2>' + esc(c.name) + '</h2>' + (c.kind ? '<span class="kind">' + esc(tr(c.kind, l)) + '</span>' : '') + '</div>' +
-        (c.week ? '<div class="week">' + CAL + '<span>' + esc(tr(c.week, l)) + '</span></div>' : '') +
+      return '<section class="chain" aria-label="' + esc(c.name) + '"' + (st ? ' data-status="' + st + '"' : '') + '>' +
+        '<div class="head"><h2>' + esc(c.name) + '</h2>' + (c.kind ? '<span class="kind">' + esc(tr(c.kind, l)) + '</span>' : '') + '</div>' + when +
         '<ul class="stores">' + rows + '</ul>' +
         (c.url ? link(c.url, esc(btn) + ' ' + ARROW, 'go', btn + ': ' + c.name) : '') +
         (c.note ? '<p class="note">' + esc(tr(c.note, l)) + '</p>' : '') +
@@ -242,23 +332,30 @@ main{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding-top:10px}
     document.getElementById('chips').innerHTML = CHIPS.map(function(c){
       return '<button class="chip" type="button" data-q="' + esc(c[0]) + '"><b lang="cs">' + esc(c[0]) + '</b>' + (l === 'uk' ? '<small>' + esc(c[1]) + '</small>' : '') + '</button>';
     }).join('');
+    document.getElementById('hint').hidden = get(HINT_KEY) === 'ok';
     // the glossary explains Czech words to a Ukrainian reader; in Czech it is not needed
     document.getElementById('gloss').hidden = l !== 'uk';
     document.getElementById('glosslist').innerHTML = GLOSS.map(function(g){ return '<dt lang="cs">' + esc(g[0]) + '</dt><dd>' + esc(g[1]) + '</dd>'; }).join('');
   }
 
-  var cat = 'food';
-  try { var sc = localStorage.getItem(CAT_KEY); if (CATS.some(function(c){ return c[0] === sc; })) cat = sc; } catch(e){}
-  function renderAll(){ var l = UI.lang(); renderStatic(l); renderCats(cat, l); renderList(cat, l); }
+  var cat = 'food', dow = 0;
+  var sc = get(CAT_KEY); if (CATS.some(function(c){ return c[0] === sc; })) cat = sc;
+  function renderAll(){ var l = UI.lang(); renderStatic(l); dow = renderWeek(l); renderCats(cat, l); renderList(cat, l, dow); }
   renderAll();
   document.addEventListener('langchange', renderAll);
+  // the app may stay open past midnight: refresh the week when it comes back to the screen
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden && pragueWeek().dow !== dow) renderAll(); });
 
+  function open(url){
+    if (tg && tg.openLink){ try { tg.openLink(url); return; } catch(e){} }
+    var w = window.open(url, '_blank', 'noopener'); if (!w) location.href = url;
+  }
   document.getElementById('cats').addEventListener('click', function(e){
     var b = e.target.closest('button[data-cat]'); if (!b) return;
     var c = b.getAttribute('data-cat'); if (c === cat) return;
-    cat = c; try { localStorage.setItem(CAT_KEY, c); } catch(err){}
+    cat = c; put(CAT_KEY, c);
     UI.press(this, 'data-cat', c);
-    renderList(c, UI.lang());
+    renderList(c, UI.lang(), dow);
     UI.haptic();
   });
   document.getElementById('find').addEventListener('submit', function(e){
@@ -273,6 +370,11 @@ main{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding-top:10px}
     document.getElementById('q').value = b.getAttribute('data-q');
     UI.haptic();
     open(kupi(b.getAttribute('data-q')));
+  });
+  document.getElementById('hintok').addEventListener('click', function(){
+    put(HINT_KEY, 'ok');
+    document.getElementById('hint').hidden = true;
+    document.getElementById('q').focus({preventScroll: true});
   });
   // Inside Telegram the chain sites open in the phone's browser: they remember the chosen store there
   document.getElementById('list').addEventListener('click', function(e){

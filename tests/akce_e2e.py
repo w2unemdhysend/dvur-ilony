@@ -38,8 +38,8 @@ STATE = """() => [...document.querySelectorAll('.chain')].map(c => ({name: c.que
   chainLink: !!c.querySelector(':scope > a.go')}))"""
 LINKS = "() => [...document.querySelectorAll('#list a, #find a')].map(a => [a.href, a.target, a.rel])"
 
-async def newctx(browser, tg_lang=None, width=340):
-    ctx = await browser.new_context(viewport={'width': width, 'height': 760})
+async def newctx(browser, tg_lang=None, width=340, tz=None):
+    ctx = await browser.new_context(viewport={'width': width, 'height': 760}, timezone_id=tz)
     body = tg_stub(tg_lang) if tg_lang else ''
     await ctx.route('**/telegram.org/**', lambda r: r.fulfill(body=body, content_type='text/javascript'))
     await ctx.route('**/fonts.googleapis.com/**', lambda r: r.fulfill(body='', content_type='text/css'))
@@ -55,7 +55,7 @@ async def main():
         await pg.goto(url); await pg.wait_for_timeout(300)
 
         food = {c['name']: c for c in await pg.evaluate(STATE)}
-        check('Ukrainian by default outside Telegram', await pg.get_attribute('html', 'lang') == 'uk' and await pg.text_content('h1') == 'Акції')
+        check('Ukrainian by default outside Telegram', await pg.get_attribute('html', 'lang') == 'uk' and await pg.text_content('h1') == 'Акції тижня')
         check('food: chains', list(food) == ['Kaufland', 'Lidl', 'Tesco', 'BILLA', 'PENNY', 'COOP'], str(list(food)))
         check('food: COOP has a flyer per store, the rest one per chain',
               food['COOP']['storeLinks'] == 2 and not food['COOP']['chainLink'] and all(food[n]['chainLink'] and not food[n]['storeLinks'] for n in food if n != 'COOP'))
@@ -77,7 +77,7 @@ async def main():
         await pg.click('.seg.lang button[data-lang="cs"]'); await pg.wait_for_timeout(200)
         cs = await pg.evaluate("({lang: document.documentElement.lang, h1: document.querySelector('h1').textContent, title: document.title, btn: document.querySelector('.chain > a.go').textContent.trim(), gloss: document.getElementById('gloss').hidden, cat: document.querySelector('#cats [aria-pressed=true]').textContent})")
         check('switch to Czech: texts, flyer button, category kept, glossary hidden',
-              cs['lang'] == 'cs' and cs['h1'] == 'Akce' and cs['btn'].startswith('Leták') and cs['gloss'] and cs['cat'] == 'Domácnost', str(cs))
+              cs['lang'] == 'cs' and cs['h1'] == 'Akce týdne' and cs['btn'].startswith('Leták') and cs['gloss'] and cs['cat'] == 'Domácnost', str(cs))
         await pg.reload(); await pg.wait_for_timeout(300)
         check('language and category remembered', await pg.get_attribute('html', 'lang') == 'cs' and await pg.get_attribute('#cats button[data-cat="home"]', 'aria-pressed') == 'true')
 
@@ -101,6 +101,28 @@ async def main():
         ctx, pg = await newctx(browser, 'uk', 390)
         await pg.goto(url); await pg.wait_for_timeout(300)
         check('inside Telegram: Ukrainian account gets Ukrainian', await pg.get_attribute('html', 'lang') == 'uk')
+        await ctx.close()
+
+
+        # the week strip and flyer tags follow the day in Prague, whatever the phone's own time zone
+        for when, day, tag, summary in [('2026-11-10T23:30:00+01:00', '10', 'tomorrow', 'Завтра нові акції: Kaufland, Tesco, BILLA, PENNY, Action.'),
+                                        ('2026-11-11T00:30:00+01:00', '11', 'today', 'Сьогодні нові акції: Kaufland, Tesco, BILLA, PENNY, Action. Завтра нові акції: Lidl.'),
+                                        ('2026-11-13T10:00:00+01:00', '13', None, 'Наступні нові акції у понеділок: Lidl.')]:
+            ctx, pg = await newctx(browser, width=340, tz='America/New_York')
+            await pg.clock.set_fixed_time(when)
+            await pg.goto(url); await pg.wait_for_timeout(300)
+            wk = await pg.evaluate("""() => ({today: document.querySelector('.day.today .dd').textContent, days: document.querySelectorAll('.day').length,
+              change: [...document.querySelectorAll('.day.change .dd')].map(d => d.textContent), sum: document.getElementById('weeksum').textContent,
+              kaufland: document.querySelector('.chain[aria-label="Kaufland"]').dataset.status || null, coop: document.querySelector('.chain[aria-label="COOP"]').dataset.status || null})""")
+            check(f'week {when[:10]}: today {day}, tags {tag}', wk['today'] == day and wk['days'] == 7 and wk['kaufland'] == tag and wk['coop'] is None and wk['sum'] == summary, str(wk))
+            await ctx.close()
+
+        ctx, pg = await newctx(browser, width=340)
+        await pg.goto(url); await pg.wait_for_timeout(300)
+        check('Monday, Wednesday and Thursday marked as flyer days', await pg.evaluate("[...document.querySelectorAll('.day')].map(d => d.classList.contains('change'))") == [True, False, True, True, False, False, False])
+        shown = await pg.is_visible('#hint')
+        await pg.click('#hintok'); await pg.reload(); await pg.wait_for_timeout(300)
+        check('kupi.cz city hint shown until dismissed', shown and not await pg.is_visible('#hint'))
         await ctx.close()
 
         if '--live' in sys.argv:   # several chain sites block plain HTTP clients, so a real browser opens each page
